@@ -1422,11 +1422,11 @@ exports.connectUser = function () {
         scope: 'uiService:sample',
         name: 'connectUser',
         config: {
-            tenantId:"9724763d-aeab-4e4b-82f5-ad8683259737",
-            clientId:"467b1bc2-8765-483f-a1d0-0ef0db15b060",
-            clientSecret:"yTI8Q~kTKA-qG1-hvNDMvOwv5oRcOr_vY7y6XcnE",
-            redirect_uri: "https://test1.idea2.io/authCallback",
-            scope: "user.read",
+            tenantId: config.get("tenantId"),
+            clientId: config.get("clientId"),
+            clientSecret: config.get("clientSecret"),
+            redirect_uri: config.get("oauthCallback"),
+            scope: config.get("scope"),
         },
         callbacks: {
             userConnected: function (originalMessage, callbackData) {
