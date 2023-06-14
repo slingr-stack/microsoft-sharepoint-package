@@ -1447,8 +1447,8 @@ exports.connectUser = function () {
                     }
                 });
 
-                sys.storage.put('access_token', res.access_token);
-                sys.storage.put('refresh_token', res.refresh_token);
+                sys.storage.put(sys.context.getCurrentUserRecord().id() +' - access_token', res.access_token);
+                sys.storage.put(sys.context.getCurrentUserRecord().id() +' - refresh_token', res.refresh_token);
 
             },
             fail: function (originalMessage, callbackData) {
