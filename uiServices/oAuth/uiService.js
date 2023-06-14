@@ -1,5 +1,4 @@
 service.connectUser = function (message) {
-    debugger;
     var config = message.config;
     var redirectUri = config.redirect_uri;
     var scope = encodeURIComponent('openid offline_access ' + config.scope.replace(/;/g, ' '));
@@ -41,8 +40,3 @@ service.connectUser = function (message) {
     var pollTimer = window.setInterval(function() {intervalFn.apply(self);}, 500);
 
 };
-
-service.function1 = function(message) {
-    console.log('function1',message);
-};
-
