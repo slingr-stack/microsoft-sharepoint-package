@@ -1419,7 +1419,7 @@ var parse = function (str) {
  ****************************************************/
 exports.connectUser = function () {
     sys.ui.sendMessage({
-        scope: 'uiService:sample',
+        scope: 'uiService:sharepoint.oAuth',
         name: 'connectUser',
         config: {
             tenantId: config.get("tenantId"),
