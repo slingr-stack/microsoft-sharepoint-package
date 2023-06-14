@@ -40,4 +40,13 @@ service.connectUser = function (message) {
 
     var pollTimer = window.setInterval(function() {intervalFn.apply(self);}, 500);
 
+
+    service.funntion1 = function (message){
+        console.log("function1 ",message);
+        config ={
+            status : "status ok"
+        }
+        service.callback(message, 'userConnected', config);
+    }
+
 };

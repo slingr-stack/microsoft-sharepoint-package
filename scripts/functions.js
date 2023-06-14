@@ -1446,11 +1446,33 @@ exports.connectUser = function () {
                         grant_type: "authorization_code"
                     }
                 });
-
-                sys.logs.error(sys.context.getCurrentUserRecord().id());
-
                 sys.storage.put(sys.context.getCurrentUserRecord().id() +' - access_token', res.access_token);
                 sys.storage.put(sys.context.getCurrentUserRecord().id() +' - refresh_token', res.refresh_token);
+
+            },
+            fail: function (originalMessage, callbackData) {
+                sys.logs.error('Fail callback')
+            }
+        }
+    });
+}
+
+
+exports.function1 = function () {
+    sys.ui.sendMessage({
+        scope: 'uiService:sharepoint.oAuth',
+        name: 'function1',
+        config: {
+            tenantId: config.get("tenantId"),
+            clientId: config.get("clientId"),
+            clientSecret: config.get("clientSecret"),
+            redirect_uri: config.get("oauthCallback"),
+            scope: config.get("scope"),
+        },
+        callbacks: {
+            userConnected: function (originalMessage, callbackData) {
+                var config = callbackData;
+                sys.logs.error('Code: ' + JSON.stringify(config.code));
 
             },
             fail: function (originalMessage, callbackData) {
