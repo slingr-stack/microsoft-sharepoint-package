@@ -1,4 +1,5 @@
 service.connectUser = function (message) {
+    debugger;
     var config = message.config;
     var redirectUri = config.redirect_uri;
     var scope = encodeURIComponent('openid offline_access ' + config.scope.replace(/;/g, ' '));

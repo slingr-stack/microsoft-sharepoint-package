@@ -11,13 +11,6 @@
     ],
     "configuration": [
         {
-            "name": "id",
-            "label": "id",
-            "description": "",
-            "type": "text",
-            "required": false
-        },
-        {
             "name": "clientId",
             "label": "Client ID",
             "description": "Client ID assigned by Google for your application",
