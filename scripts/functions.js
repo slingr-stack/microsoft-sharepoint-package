@@ -1447,6 +1447,8 @@ exports.connectUser = function () {
                     }
                 });
 
+                sys.logs.error(sys.context.getCurrentUserRecord().id());
+
                 sys.storage.put(sys.context.getCurrentUserRecord().id() +' - access_token', res.access_token);
                 sys.storage.put(sys.context.getCurrentUserRecord().id() +' - refresh_token', res.refresh_token);
 
