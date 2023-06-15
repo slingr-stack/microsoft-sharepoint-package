@@ -42,7 +42,7 @@ service.connectUser = function (message) {
 
 };
 
-service.funntion1 = function (message){
+service.function1 = function (message){
     console.log("function1 ",message);
     config ={
         status : "status ok"
