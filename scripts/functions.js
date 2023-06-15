@@ -1472,7 +1472,7 @@ exports.function1 = function () {
         callbacks: {
             userConnected: function (originalMessage, callbackData) {
                 var config = callbackData;
-                sys.logs.error('Code: ' + JSON.stringify(config.code));
+                sys.logs.error('Code: ' + JSON.stringify(config));
 
             },
             fail: function (originalMessage, callbackData) {
