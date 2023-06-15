@@ -15,14 +15,14 @@
       "label": "function 1",
       "name": "function1",
       "callbacks": [
-        "userConnected,fail"
+        "userConnected","fail"
       ]
     },
     {
       "label": "Connect User",
       "name": "connectUser",
       "callbacks": [
-        "userConnected,fail"
+        "userConnected","fail"
       ]
     }
   ],
