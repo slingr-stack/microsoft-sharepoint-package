@@ -12,13 +12,6 @@
   "byGroups": false,
   "functions": [
     {
-      "label": "function 1",
-      "name": "function1",
-      "callbacks": [
-        "userConnected","fail"
-      ]
-    },
-    {
       "label": "Connect User",
       "name": "connectUser",
       "callbacks": [
