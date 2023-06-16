@@ -1524,7 +1524,7 @@ function setAuthorization(options) {
     var authorization = options.authorization || {};
     authorization = mergeJSON(authorization, {
         type: "oauth2",
-        accessToken: sys.storage.get('access_token'),
+        accessToken: sys.storage.get(sys.context.getCurrentUserRecord().id() +' - access_token'),
         headerPrefix: "Bearer"
     });
     options.authorization = authorization;
