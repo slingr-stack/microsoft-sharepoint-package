@@ -1419,7 +1419,7 @@ var parse = function (str) {
  ****************************************************/
 exports.connectUser = function () {
     sys.ui.sendMessage({
-        scope: 'uiService:sample',
+        scope: 'uiService:sharepoint.oAuth',
         name: 'connectUser',
         config: {
             tenantId: config.get("tenantId"),
@@ -1446,9 +1446,33 @@ exports.connectUser = function () {
                         grant_type: "authorization_code"
                     }
                 });
+                sys.storage.put(sys.context.getCurrentUserRecord().id() +' - access_token', res.access_token);
+                sys.storage.put(sys.context.getCurrentUserRecord().id() +' - refresh_token', res.refresh_token);
 
-                sys.storage.put('access_token', res.access_token);
-                sys.storage.put('refresh_token', res.refresh_token);
+            },
+            fail: function (originalMessage, callbackData) {
+                sys.logs.error('Fail callback')
+            }
+        }
+    });
+}
+
+
+exports.function1 = function () {
+    sys.ui.sendMessage({
+        scope: 'uiService:sharepoint.oAuth',
+        name: 'function1',
+        config: {
+            tenantId: config.get("tenantId"),
+            clientId: config.get("clientId"),
+            clientSecret: config.get("clientSecret"),
+            redirect_uri: config.get("oauthCallback"),
+            scope: config.get("scope"),
+        },
+        callbacks: {
+            userConnected: function (originalMessage, callbackData) {
+                var config = callbackData;
+                sys.logs.error('Code: ' + JSON.stringify(config));
 
             },
             fail: function (originalMessage, callbackData) {
@@ -1500,7 +1524,7 @@ function setAuthorization(options) {
     var authorization = options.authorization || {};
     authorization = mergeJSON(authorization, {
         type: "oauth2",
-        accessToken: sys.storage.get('access_token'),
+        accessToken: sys.storage.get(sys.context.getCurrentUserRecord().id() +' - access_token'),
         headerPrefix: "Bearer"
     });
     options.authorization = authorization;
