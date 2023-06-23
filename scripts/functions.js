@@ -1414,6 +1414,48 @@ var parse = function (str) {
         throw err;
     }
 }
+/****************************************************
+ OAuth
+ ****************************************************/
+exports.connectUser = function () {
+    sys.ui.sendMessage({
+        scope: 'uiService:sharepoint.oAuth',
+        name: 'connectUser',
+        config: {
+            tenantId: config.get("tenantId"),
+            clientId: config.get("clientId"),
+            clientSecret: config.get("clientSecret"),
+            redirect_uri: config.get("oauthCallback"),
+            scope: config.get("scope"),
+        },
+        callbacks: {
+            userConnected: function (originalMessage, callbackData) {
+                var config = callbackData;
+                sys.logs.error('Code: ' + JSON.stringify(config.code));
+                var res = svc.http.post({
+                    url: `https://login.microsoftonline.com/`+config.tenantId+`/oauth2/v2.0/token`,
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: {
+                        client_id: config.clientId,
+                        client_secret: config.clientSecret,
+                        code: config.code,
+                        redirect_uri: config.redirect_uri,
+                        grant_type: "authorization_code"
+                    }
+                });
+                sys.storage.put(sys.context.getCurrentUserRecord().id() +' - access_token', res.access_token);
+                sys.storage.put(sys.context.getCurrentUserRecord().id() +' - refresh_token', res.refresh_token);
+
+            },
+            fail: function (originalMessage, callbackData) {
+                sys.logs.error('Fail callback')
+            }
+        }
+    });
+}
 
 /****************************************************
  Constants
