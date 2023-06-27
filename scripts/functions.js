@@ -1473,7 +1473,7 @@ function setAuthorization(options) {
     var authorization = options.authorization || {};
     authorization = mergeJSON(authorization, {
         type: "oauth2",
-        accessToken: sys.storage.get(config.id() +' - access_token'),
+        accessToken: sys.storage.get(config.get("oauth").id +' - access_token'),
         headerPrefix: "Bearer"
     });
     options.authorization = authorization;
