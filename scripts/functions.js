@@ -2,7 +2,7 @@
  Dependencies
  ****************************************************/
 
-var httpService = svc.http;
+var httpService = dependencies.http;
 
 /****************************************************
  Helpers
