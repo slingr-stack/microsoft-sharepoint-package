@@ -2,7 +2,7 @@
  Listeners
  ****************************************************/
 
-listeners.defaultWebhook = {
+listeners.defaultWebhookSharepoint = {
     label: 'Catch HTTP sharepoint events',
     type: 'service',
     options: {
