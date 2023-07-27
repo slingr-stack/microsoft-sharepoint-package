@@ -11,7 +11,7 @@
         {
             "type": "package",
             "name": "oauth",
-            "version": "v1.0.7"
+            "version": "v1.0.10"
         }
     ],
     "configuration": [
@@ -27,7 +27,7 @@
         {
             "label": "Webhook",
             "name": "webhook",
-            "description": "Happens when SharePoint sends a webhook to the endpoint."
+            "description": "Happens when SharePoint sends a webhook to the package."
         },
         {
             "label": "User connected to sharepoint",

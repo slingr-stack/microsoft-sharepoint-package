@@ -4,6 +4,27 @@
 
 var httpService = dependencies.http;
 
+function handleRequestWithRetry(requestFn, options, callbackData, callbacks) {
+    sys.logs.info("Call function handleRequestWithRetry");
+    try {
+        return requestFn(options, callbackData, callbacks);
+    } catch (error) {
+        sys.logs.info("[sharepoint] Handling request with retry "+ JSON.stringify(error));
+        dependencies.oauth.functions.refreshToken('sharepoint:refreshToken');
+        return requestFn(setAuthorization(options), callbackData, callbacks);
+    }
+}
+
+exports.getAccessToken = function () {
+    sys.logs.info("[sharepoint] Getting access token from oauth");
+    return dependencies.oauth.functions.connectUser('sharepoint:userConnected');
+}
+
+exports.removeAccessToken = function () {
+    sys.logs.info("[sharepoint] Removing access token from oauth");
+    return dependencies.oauth.functions.disconnectUser('sharepoint:disconnectUser');
+}
+
 /****************************************************
  Helpers
  ****************************************************/
@@ -1363,9 +1384,6 @@ exports.utils.fromMillisToDate = function (params) {
  Private helpers
  ****************************************************/
 
-var concatQuery = function (url, key, value) {
-    return url + ((!url || url.indexOf('?') < 0) ? '?' : '&') + key + "=" + value;
-}
 
 var checkHttpOptions = function (url, options) {
     options = options || {};
@@ -1375,7 +1393,7 @@ var checkHttpOptions = function (url, options) {
             options = url || {};
         } else {
             if (!!options.path || !!options.params || !!options.body) {
-                // options contains the http package format
+                // options contain the http package format
                 options.path = url;
             } else {
                 // create html package
@@ -1416,29 +1434,11 @@ var parse = function (str) {
 }
 
 /****************************************************
- oauth
- ****************************************************/
-exports.getAccessToken = function () {
-    return dependencies.oauth.functions.connectUser('sharepoint:userConnected');
-}
-
-function handleRequestWithRetry(requestFn, options, callbackData, callbacks) {
-    sys.logs.info("Call function handleRequestWithRetry");
-    try {
-        return requestFn(options, callbackData, callbacks);
-    } catch (error) {
-        sys.logs.error(JSON.stringify(error));
-        dependencies.oauth.functions.refreshToken();
-        return requestFn(setAuthorization(options), callbackData, callbacks);
-    }
-}
-
-/****************************************************
  Constants
  ****************************************************/
 
-var SHAREPOINT_API_BASE_URL = "https://graph.microsoft.com"; // TODO: Set the base url
-var API_URL = SHAREPOINT_API_BASE_URL + ""; // TODO: Set the base url for the api
+var SHAREPOINT_API_BASE_URL = "https://graph.microsoft.com";
+var API_URL = SHAREPOINT_API_BASE_URL + "";
 
 /****************************************************
  Configurator
