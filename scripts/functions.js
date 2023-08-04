@@ -1473,6 +1473,10 @@ function setRequestHeaders(options) {
 
 function setAuthorization(options) {
     var authorization = options.authorization || {};
+    sys.logs.debug('[sharepoint] setting authorization');
+    sys.logs.debug('[sharepoint] config: '+JSON.stringify(config));
+    sys.logs.debug('[sharepoint] config id: '+JSON.stringify(config.get("id")));
+
     authorization = mergeJSON(authorization, {
         type: "oauth2",
         accessToken: sys.storage.get(config.get("id") + ' - access_token',{decrypt:true}),
