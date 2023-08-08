@@ -7,6 +7,7 @@
 
 let configurationBuilder = function (config) {
     let newConfig = config || {};
+    newConfig.oauth = {};
     let oauthConfig = newConfig.oauth
     oauthConfig.id = config.id;
     oauthConfig.authUrl = config.authUrl;
