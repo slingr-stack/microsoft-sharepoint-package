@@ -1,21 +1,17 @@
 /****************************************************
  Configuration builder
-
- The configuration object should be built in order to configure the package dependencies
-
  ****************************************************/
 
 let configurationBuilder = function (config) {
-    let newConfig = config || {};
-    newConfig.oauth = {};
-    let oauthConfig = newConfig.oauth
-    oauthConfig.id = config.id;
-    oauthConfig.authUrl = config.authUrl;
-    oauthConfig.accessTokenUrl = config.accessTokenUrl;
-    oauthConfig.clientId = config.clientId;
-    oauthConfig.clientSecret = config.clientSecret;
-    oauthConfig.scope = config.scope;
-    oauthConfig.state = config.state;
-    oauthConfig.oauthCallback = config.oauthCallback;
-    return newConfig;
+    config.oauth = {
+        id: config.id || 'installationInfo-Sharepoint-User-'+sys.context.getCurrentUserRecord().id(),
+        authUrl: config.authUrl,
+        accessTokenUrl: config.accessTokenUrl,
+        clientId: config.clientId,
+        clientSecret: config.clientSecret,
+        scope: config.scope,
+        state: config.state,
+        oauthCallback: config.oauthCallback
+	};
+    return config;
 }

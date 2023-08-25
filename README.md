@@ -8,8 +8,8 @@
     </thead>
     <tbody>
     <tr>
-        <td>Github package</td>
-        <td>July 27, 2023</td>
+        <td>Sharepoint package</td>
+        <td>August 25, 2023</td>
         <td>Detailed description of the API of the Sharepoint package.</td>
     </tr>
     </tbody>
@@ -17,25 +17,25 @@
 
 # Overview
 
-
+This package allows you to connect to the Sharepoint API and perform operations on it.
 
 # Javascript API
 
 The Javascript API of the sharepoint package has three pieces:
 
-- **HTTP requests**: These allow to make regular HTTP requests.
+- **HTTP requests**: These allow making regular HTTP requests.
 - **Shortcuts**: These are helpers to make HTTP request to the API in a more convenient way.
-- **Additional Helpers**: These helpers provide additional features that facilitate or improve the package usage in SLINGR.
+- **Additional Helpers**: These helpers provide additional features that facilitate or improves the package usage in SLINGR.
 
 ## HTTP requests
-You can make `GET`,`POST`,`PATCH`,`DELETE` requests to the [sharepoint API](https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/get-to-know-the-sharepoint-rest-service?tabs=csom) like this:
+You can make `GET`,`POST`,`PATCH`,`DELETE` requests to the [sharepoint API](API_URL_HERE) like this:
 ```javascript
-var response = pkg.sharepoint.functions.get('/v1.0/sites/:siteId/operations/:richLongRunningOperation-ID')
-var response = pkg.sharepoint.functions.post('/v1.0/users/:user-id/followedSites/remove', body)
-var response = pkg.sharepoint.functions.post('/v1.0/users/:user-id/followedSites/remove')
-var response = pkg.sharepoint.functions.patch('/v1.0/sites/:site-id/termStore/sets/:set-id', body)
-var response = pkg.sharepoint.functions.patch('/v1.0/sites/:site-id/termStore/sets/:set-id')
-var response = pkg.sharepoint.functions.delete('/v1.0/sites/:site-id/termStore/groups/:group-id')
+var response = pkg.sharepoint.functions.get('/v1.0/sites/:site-id/termStore/groups/:group-id/sets/:set-id/terms/:term-id')
+var response = pkg.sharepoint.functions.post('/v1.0/sites/:site-id/contentTypes/:contentType-id/columns', body)
+var response = pkg.sharepoint.functions.post('/v1.0/sites/:site-id/contentTypes/:contentType-id/columns')
+var response = pkg.sharepoint.functions.patch('/v1.0/sites/:site-id/termStore', body)
+var response = pkg.sharepoint.functions.patch('/v1.0/sites/:site-id/termStore')
+var response = pkg.sharepoint.functions.delete('/v1.0/sites/:site-id/lists/:list-id/items/:item-id')
 ```
 
 Please take a look at the documentation of the [HTTP service](https://github.com/slingr-stack/http-service)
@@ -49,40 +49,10 @@ Instead of having to use the generic HTTP methods, you can (and should) make use
 
 <br>
 
-* API URL: '/v1.0/sites/:sitesId/permissions/:permissionId'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.permissions.get(sitesId)
-```
----
-* API URL: '/v1.0/sites/:sitesId/permissions'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.permissions.get()
-```
----
-* API URL: '/v1.0/sites/:hostname/:site-relative-path'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.get(hostname)
-```
----
 * API URL: '/v1.0/sites'
 * HTTP Method: 'GET'
 ```javascript
 pkg.sharepoint.functions.sites.get()
-```
----
-* API URL: '/v1.0/sites/:site-id/lists'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.get()
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.get(siteId)
 ```
 ---
 * API URL: '/v1.0/me/followedSites'
@@ -91,268 +61,10 @@ pkg.sharepoint.functions.sites.lists.get(siteId)
 pkg.sharepoint.functions.me.followedSites.get()
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/columns'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.columns.get()
-```
----
-* API URL: '/v1.0/sites/:site-id/columns/:column-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.columns.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/contentTypes'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.contentTypes.get()
-```
----
-* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.contentTypes.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:siteId/getApplicableContentTypesForList'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.getApplicableContentTypesForList.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/sites'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.sites.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:siteId/operations'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.operations.get()
-```
----
-* API URL: '/v1.0/sites/:siteId/operations/:richLongRunningOperation-ID'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.operations.get(siteId)
-```
----
 * API URL: '/v1.0/sites/getAllSites'
 * HTTP Method: 'GET'
 ```javascript
 pkg.sharepoint.functions.sites.getAllSites.get()
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/items'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.items.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.items.get(siteId, listId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/columns'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.columns.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/columns/:column-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.columns.get(siteId, listId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.get(siteId, listId)
-```
----
-* API URL: '/v1.0/sites/:siteId/lists/:listId/operations'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.operations.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:siteId/lists/:listId/operations/:richLongRunningOperation-ID'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.operations.get(siteId, listId)
-```
----
-* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id/columns/:column-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.contentTypes.columns.get(siteId, contentTypeId)
-```
----
-* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id/columns'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.contentTypes.columns.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns/:column-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.columns.get(siteId, listId, contentTypeId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.columns.get(siteId, listId)
-```
----
-* API URL: '/v1.0/sites/:siteId/contentTypes/:contentTypeId/isPublished'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.contentTypes.isPublished.get(siteId, contentTypeId)
-```
----
-* API URL: '/v1.0/sites/:siteId/lists/:listId/contentTypes/getCompatibleHubContentTypes'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.getCompatibleHubContentTypes.get(siteId, listId)
-```
----
-* API URL: '/v1.0/sites/:siteId/contentTypes/getCompatibleHubContentTypes'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.contentTypes.getCompatibleHubContentTypes.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/items/:item-id/versions'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.items.versions.get(siteId, itemId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id/versions'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.items.versions.get(siteId, listId, itemId)
-```
----
-* API URL: '/v1.0/sites/:site-id/analytics/allTime'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.analytics.allTime.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id/analytics/allTime'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.items.analytics.allTime.get(siteId, listId, itemId)
-```
----
-* API URL: '/v1.0/drives/:drive-id/items/:item-id/analytics/lastSevenDays'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.drives.items.analytics.lastSevenDays.get(driveId, itemId)
-```
----
-* API URL: '/v1.0/sites/:site-id/analytics/lastSevenDays'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.analytics.lastSevenDays.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id/analytics/lastSevenDays'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.items.analytics.lastSevenDays.get(siteId, listId, itemId)
-```
----
-* API URL: '/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.items.documentSetVersions.get(siteId, listId)
-```
----
-* API URL: '/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions/:documentSetVersionId'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.lists.items.documentSetVersions.get(siteId, listId, itemId)
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore/groups'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.groups.get()
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore/groups/:group-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.groups.get(siteId)
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore/groups/:group-id/sets'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.groups.sets.get(siteId, groupId)
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.sets.get(siteId, setId)
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/children'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.sets.children.get(siteId, setId)
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/children'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.sets.terms.children.get(siteId, setId, termId)
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore/groups/:group-id/sets/:set-id/terms/:term-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.groups.sets.terms.get(siteId, groupId, setId, termId)
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.sets.terms.get(siteId, setId, termId)
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/relations'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.sets.relations.get(siteId, setId)
-```
----
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/relations'
-* HTTP Method: 'GET'
-```javascript
-pkg.sharepoint.functions.sites.termStore.sets.terms.relations.get(siteId, setId, termId)
 ```
 ---
 * API URL: '/v1.0/admin/sharepoint/settings'
@@ -361,22 +73,22 @@ pkg.sharepoint.functions.sites.termStore.sets.terms.relations.get(siteId, setId,
 pkg.sharepoint.functions.admin.sharepoint.settings.get()
 ```
 ---
-* API URL: '/v1.0/sites/:sitesId/permissions'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/admin/sharepoint/settings'
+* HTTP Method: 'PATCH'
 ```javascript
-pkg.sharepoint.functions.sites.permissions.post(sitesId, body)
+pkg.sharepoint.functions.admin.sharepoint.settings.patch(body)
 ```
 ---
-* API URL: '/v1.0/users/:user-id/followedSites/add'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:hostname/:site-relative-path'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.users.followedSites.add.post(userId, body)
+pkg.sharepoint.functions.sites.get(hostname)
 ```
 ---
-* API URL: '/v1.0/users/:user-id/followedSites/remove'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:site-id/columns'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.users.followedSites.remove.post(userId, body)
+pkg.sharepoint.functions.sites.columns.get()
 ```
 ---
 * API URL: '/v1.0/sites/:site-id/columns'
@@ -386,9 +98,21 @@ pkg.sharepoint.functions.sites.columns.post(siteId, body)
 ```
 ---
 * API URL: '/v1.0/sites/:site-id/contentTypes'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.get()
+```
+---
+* API URL: '/v1.0/sites/:site-id/contentTypes'
 * HTTP Method: 'POST'
 ```javascript
 pkg.sharepoint.functions.sites.contentTypes.post(siteId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.get()
 ```
 ---
 * API URL: '/v1.0/sites/:site-id/lists'
@@ -397,82 +121,106 @@ pkg.sharepoint.functions.sites.contentTypes.post(siteId, body)
 pkg.sharepoint.functions.sites.lists.post(siteId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/columns'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:site-id/sites'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.lists.columns.post(siteId, listId, body)
+pkg.sharepoint.functions.sites.sites.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/addCopy'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:site-id/termStore'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.addCopy.post(siteId, listId, body)
+pkg.sharepoint.functions.sites.termStore.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:siteId/contentTypes/:contentTypeId/publish'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:site-id/termStore'
+* HTTP Method: 'PATCH'
 ```javascript
-pkg.sharepoint.functions.sites.contentTypes.publish.post(siteId, contentTypeId, body)
+pkg.sharepoint.functions.sites.termStore.patch(siteId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:siteId/contentTypes/:contentTypeId/unpublish'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:siteId/getApplicableContentTypesForList'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.contentTypes.unpublish.post(siteId, contentTypeId, body)
+pkg.sharepoint.functions.sites.getApplicableContentTypesForList.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:siteId/lists/:listId/contentTypes/addCopyFromContentTypeHub'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:siteId/operations'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.addCopyFromContentTypeHub.post(siteId, listId, body)
+pkg.sharepoint.functions.sites.operations.get()
 ```
 ---
-* API URL: '/v1.0/sites/:siteId/contentTypes/addCopyFromContentTypeHub'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:sitesId/permissions'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.contentTypes.addCopyFromContentTypeHub.post(siteId, body)
+pkg.sharepoint.functions.sites.permissions.get()
 ```
 ---
-* API URL: '/v1.0/sites/:siteId/contentTypes/:contentTypeId/associateWithHubSites'
+* API URL: '/v1.0/sites/:sitesId/permissions'
 * HTTP Method: 'POST'
 ```javascript
-pkg.sharepoint.functions.sites.contentTypes.associateWithHubSites.post(siteId, contentTypeId, body)
+pkg.sharepoint.functions.sites.permissions.post(sitesId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:siteId/contentTypes/:contentTypeId/copyToDefaultContentLocation'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:site-id/analytics/allTime'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.contentTypes.copyToDefaultContentLocation.post(siteId, contentTypeId, body)
+pkg.sharepoint.functions.sites.analytics.allTime.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id/columns'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:site-id/analytics/lastSevenDays'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.contentTypes.columns.post(siteId, contentTypeId, body)
+pkg.sharepoint.functions.sites.analytics.lastSevenDays.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/column'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:site-id/columns/:column-id'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.column.post(siteId, listId, contentTypeId, body)
+pkg.sharepoint.functions.sites.columns.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/items'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:site-id/columns/:column-id'
+* HTTP Method: 'PATCH'
 ```javascript
-pkg.sharepoint.functions.sites.lists.items.post(siteId, listId, body)
+pkg.sharepoint.functions.sites.columns.patch(siteId, columnId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:site-id/columns/:column-id'
+* HTTP Method: 'DELETE'
 ```javascript
-pkg.sharepoint.functions.sites.lists.items.documentSetVersions.post(siteId, listId, itemId, body)
+pkg.sharepoint.functions.sites.columns.delete(siteId, columnId)
 ```
 ---
-* API URL: '/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions/:documentSetVersionId/restore'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.lists.items.documentSetVersions.restore.post(siteId, listId, itemId, documentSetVersionId, body)
+pkg.sharepoint.functions.sites.contentTypes.get(siteId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id'
+* HTTP Method: 'PATCH'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.patch(siteId, contentTypeId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id'
+* HTTP Method: 'DELETE'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.delete(siteId, contentTypeId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.get(siteId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/groups'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.termStore.groups.get()
 ```
 ---
 * API URL: '/v1.0/sites/:site-id/termStore/groups'
@@ -487,22 +235,28 @@ pkg.sharepoint.functions.sites.termStore.groups.post(siteId, body)
 pkg.sharepoint.functions.sites.termStore.sets.post(siteId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/children'
+* API URL: '/v1.0/sites/:siteId/contentTypes/addCopyFromContentTypeHub'
 * HTTP Method: 'POST'
 ```javascript
-pkg.sharepoint.functions.sites.termStore.sets.terms.children.post(siteId, setId, termId, body)
+pkg.sharepoint.functions.sites.contentTypes.addCopyFromContentTypeHub.post(siteId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/children'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:siteId/contentTypes/getCompatibleHubContentTypes'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.termStore.sets.children.post(siteId, setId, body)
+pkg.sharepoint.functions.sites.contentTypes.getCompatibleHubContentTypes.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/relations'
-* HTTP Method: 'POST'
+* API URL: '/v1.0/sites/:siteId/operations/:richLongRunningOperation-ID'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.termStore.sets.terms.relations.post(siteId, setId, termId, body)
+pkg.sharepoint.functions.sites.operations.get(siteId)
+```
+---
+* API URL: '/v1.0/sites/:sitesId/permissions/:permissionId'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.permissions.get(sitesId)
 ```
 ---
 * API URL: '/v1.0/sites/:sitesId/permissions/:permissionId'
@@ -511,124 +265,70 @@ pkg.sharepoint.functions.sites.termStore.sets.terms.relations.post(siteId, setId
 pkg.sharepoint.functions.sites.permissions.patch(sitesId, permissionId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/columns/:column-id'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/users/:user-id/followedSites/add'
+* HTTP Method: 'POST'
 ```javascript
-pkg.sharepoint.functions.sites.columns.patch(siteId, columnId, body)
+pkg.sharepoint.functions.users.followedSites.add.post(userId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/columns/:column-id'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/users/:user-id/followedSites/remove'
+* HTTP Method: 'POST'
 ```javascript
-pkg.sharepoint.functions.sites.lists.columns.patch(siteId, listId, columnId, body)
+pkg.sharepoint.functions.users.followedSites.remove.post(userId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id/columns/:column-id'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id/columns'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.contentTypes.columns.patch(siteId, contentTypeId, columnId, body)
+pkg.sharepoint.functions.sites.contentTypes.columns.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns/:column-id'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id/columns'
+* HTTP Method: 'POST'
 ```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.columns.patch(siteId, listId, contentTypeId, columnId, body)
+pkg.sharepoint.functions.sites.contentTypes.columns.post(siteId, contentTypeId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/sites/:site-id/items/:item-id/versions'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.contentTypes.patch(siteId, contentTypeId, body)
+pkg.sharepoint.functions.sites.items.versions.get(siteId, itemId)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/columns'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.patch(siteId, listId, contentTypeId, body)
+pkg.sharepoint.functions.sites.lists.columns.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/columns'
+* HTTP Method: 'POST'
 ```javascript
-pkg.sharepoint.functions.sites.lists.items.patch(siteId, listId, itemId, body)
+pkg.sharepoint.functions.sites.lists.columns.post(siteId, listId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id/fields'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.lists.items.fields.patch(siteId, listId, itemId, body)
+pkg.sharepoint.functions.sites.lists.contentTypes.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/termStore'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/items'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.termStore.patch(siteId, body)
+pkg.sharepoint.functions.sites.lists.items.get(siteId)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/items'
+* HTTP Method: 'POST'
 ```javascript
-pkg.sharepoint.functions.sites.termStore.sets.patch(siteId, setId, body)
+pkg.sharepoint.functions.sites.lists.items.post(siteId, listId, body)
 ```
 ---
-* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id'
-* HTTP Method: 'PATCH'
+* API URL: '/v1.0/sites/:site-id/termStore/groups/:group-id'
+* HTTP Method: 'GET'
 ```javascript
-pkg.sharepoint.functions.sites.termStore.sets.terms.patch(siteId, setId, termId, body)
-```
----
-* API URL: '/v1.0/admin/sharepoint/settings'
-* HTTP Method: 'PATCH'
-```javascript
-pkg.sharepoint.functions.admin.sharepoint.settings.patch(body)
-```
----
-* API URL: '/v1.0/sites/:site-id/columns/:column-id'
-* HTTP Method: 'DELETE'
-```javascript
-pkg.sharepoint.functions.sites.columns.delete(siteId, columnId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/columns/:column-id'
-* HTTP Method: 'DELETE'
-```javascript
-pkg.sharepoint.functions.sites.lists.columns.delete(siteId, listId, columnId)
-```
----
-* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id/columns/:column-id'
-* HTTP Method: 'DELETE'
-```javascript
-pkg.sharepoint.functions.sites.contentTypes.columns.delete(siteId, contentTypeId, columnId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns/:column-id'
-* HTTP Method: 'DELETE'
-```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.columns.delete(siteId, listId, contentTypeId, columnId)
-```
----
-* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id'
-* HTTP Method: 'DELETE'
-```javascript
-pkg.sharepoint.functions.sites.contentTypes.delete(siteId, contentTypeId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id'
-* HTTP Method: 'DELETE'
-```javascript
-pkg.sharepoint.functions.sites.lists.contentTypes.delete(siteId, listId, contentTypeId)
-```
----
-* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id'
-* HTTP Method: 'DELETE'
-```javascript
-pkg.sharepoint.functions.sites.lists.items.delete(siteId, listId, itemId)
-```
----
-* API URL: '/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions/:documentSetVersionId'
-* HTTP Method: 'DELETE'
-```javascript
-pkg.sharepoint.functions.sites.lists.items.documentSetVersions.delete(siteId, listId, itemId, documentSetVersionId)
+pkg.sharepoint.functions.sites.termStore.groups.get(siteId)
 ```
 ---
 * API URL: '/v1.0/sites/:site-id/termStore/groups/:group-id'
@@ -638,15 +338,315 @@ pkg.sharepoint.functions.sites.termStore.groups.delete(siteId, groupId)
 ```
 ---
 * API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.get(siteId, setId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id'
+* HTTP Method: 'PATCH'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.patch(siteId, setId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id'
 * HTTP Method: 'DELETE'
 ```javascript
 pkg.sharepoint.functions.sites.termStore.sets.delete(siteId, setId)
+```
+---
+* API URL: '/v1.0/sites/:siteId/contentTypes/:contentTypeId/associateWithHubSites'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.associateWithHubSites.post(siteId, contentTypeId, body)
+```
+---
+* API URL: '/v1.0/sites/:siteId/contentTypes/:contentTypeId/copyToDefaultContentLocation'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.copyToDefaultContentLocation.post(siteId, contentTypeId, body)
+```
+---
+* API URL: '/v1.0/sites/:siteId/contentTypes/:contentTypeId/isPublished'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.isPublished.get(siteId, contentTypeId)
+```
+---
+* API URL: '/v1.0/sites/:siteId/contentTypes/:contentTypeId/publish'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.publish.post(siteId, contentTypeId, body)
+```
+---
+* API URL: '/v1.0/sites/:siteId/contentTypes/:contentTypeId/unpublish'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.unpublish.post(siteId, contentTypeId, body)
+```
+---
+* API URL: '/v1.0/sites/:siteId/lists/:listId/operations'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.operations.get(siteId)
+```
+---
+* API URL: '/v1.0/drives/:drive-id/items/:item-id/analytics/lastSevenDays'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.drives.items.analytics.lastSevenDays.get(driveId, itemId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id/columns/:column-id'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.columns.get(siteId, contentTypeId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id/columns/:column-id'
+* HTTP Method: 'PATCH'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.columns.patch(siteId, contentTypeId, columnId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/contentTypes/:contentType-id/columns/:column-id'
+* HTTP Method: 'DELETE'
+```javascript
+pkg.sharepoint.functions.sites.contentTypes.columns.delete(siteId, contentTypeId, columnId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/columns/:column-id'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.columns.get(siteId, listId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/columns/:column-id'
+* HTTP Method: 'PATCH'
+```javascript
+pkg.sharepoint.functions.sites.lists.columns.patch(siteId, listId, columnId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/columns/:column-id'
+* HTTP Method: 'DELETE'
+```javascript
+pkg.sharepoint.functions.sites.lists.columns.delete(siteId, listId, columnId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.get(siteId, listId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id'
+* HTTP Method: 'PATCH'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.patch(siteId, listId, contentTypeId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id'
+* HTTP Method: 'DELETE'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.delete(siteId, listId, contentTypeId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/addCopy'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.addCopy.post(siteId, listId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.get(siteId, listId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id'
+* HTTP Method: 'PATCH'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.patch(siteId, listId, itemId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id'
+* HTTP Method: 'DELETE'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.delete(siteId, listId, itemId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/groups/:group-id/sets'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.termStore.groups.sets.get(siteId, groupId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/children'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.children.get(siteId, setId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/children'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.children.post(siteId, setId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/relations'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.relations.get(siteId, setId)
+```
+---
+* API URL: '/v1.0/sites/:siteId/lists/:listId/contentTypes/addCopyFromContentTypeHub'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.addCopyFromContentTypeHub.post(siteId, listId, body)
+```
+---
+* API URL: '/v1.0/sites/:siteId/lists/:listId/contentTypes/getCompatibleHubContentTypes'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.getCompatibleHubContentTypes.get(siteId, listId)
+```
+---
+* API URL: '/v1.0/sites/:siteId/lists/:listId/operations/:richLongRunningOperation-ID'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.operations.get(siteId, listId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/column'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.column.post(siteId, listId, contentTypeId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.columns.get(siteId, listId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id/fields'
+* HTTP Method: 'PATCH'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.fields.patch(siteId, listId, itemId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id/versions'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.versions.get(siteId, listId, itemId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.terms.get(siteId, setId, termId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id'
+* HTTP Method: 'PATCH'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.terms.patch(siteId, setId, termId, body)
 ```
 ---
 * API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id'
 * HTTP Method: 'DELETE'
 ```javascript
 pkg.sharepoint.functions.sites.termStore.sets.terms.delete(siteId, setId, termId)
+```
+---
+* API URL: '/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.documentSetVersions.get(siteId, listId)
+```
+---
+* API URL: '/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.documentSetVersions.post(siteId, listId, itemId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns/:column-id'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.columns.get(siteId, listId, contentTypeId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns/:column-id'
+* HTTP Method: 'PATCH'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.columns.patch(siteId, listId, contentTypeId, columnId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns/:column-id'
+* HTTP Method: 'DELETE'
+```javascript
+pkg.sharepoint.functions.sites.lists.contentTypes.columns.delete(siteId, listId, contentTypeId, columnId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id/analytics/allTime'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.analytics.allTime.get(siteId, listId, itemId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/lists/:list-id/items/:item-id/analytics/lastSevenDays'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.analytics.lastSevenDays.get(siteId, listId, itemId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/children'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.terms.children.get(siteId, setId, termId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/children'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.terms.children.post(siteId, setId, termId, body)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/relations'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.terms.relations.get(siteId, setId, termId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/relations'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.termStore.sets.terms.relations.post(siteId, setId, termId, body)
+```
+---
+* API URL: '/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions/:documentSetVersionId'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.documentSetVersions.get(siteId, listId, itemId)
+```
+---
+* API URL: '/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions/:documentSetVersionId'
+* HTTP Method: 'DELETE'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.documentSetVersions.delete(siteId, listId, itemId, documentSetVersionId)
+```
+---
+* API URL: '/v1.0/sites/:site-id/termStore/groups/:group-id/sets/:set-id/terms/:term-id'
+* HTTP Method: 'GET'
+```javascript
+pkg.sharepoint.functions.sites.termStore.groups.sets.terms.get(siteId, groupId, setId, termId)
+```
+---
+* API URL: '/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions/:documentSetVersionId/restore'
+* HTTP Method: 'POST'
+```javascript
+pkg.sharepoint.functions.sites.lists.items.documentSetVersions.restore.post(siteId, listId, itemId, documentSetVersionId, body)
 ```
 ---
 
@@ -701,7 +701,7 @@ Generic flow step for full use of the entire package and its services.
         <td>
             The url to which this endpoint will send the request. This is the exact service to which the http request will be made. <br>
             Possible values are: <br>
-            <i><strong>/v1.0/sites/{sitesId}/permissions/{permissionId}<br>/v1.0/sites/{sitesId}/permissions<br>/v1.0/sites/{hostname}/{site-relative-path}<br>/v1.0/sites<br>/v1.0/sites/{site-id}/lists<br>/v1.0/sites/{site-id}/lists/{list-id}<br>/v1.0/me/followedSites<br>/v1.0/sites/{site-id}/columns<br>/v1.0/sites/{site-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/contentTypes<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}<br>/v1.0/sites/{siteId}/getApplicableContentTypesForList<br>/v1.0/sites/{site-id}/sites<br>/v1.0/sites/{siteId}/operations<br>/v1.0/sites/{siteId}/operations/{richLongRunningOperation-ID}<br>/v1.0/sites/getAllSites<br>/v1.0/sites/{site-id}/lists/{list-id}/items<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/columns<br>/v1.0/sites/{site-id}/lists/{list-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}<br>/v1.0/sites/{siteId}/lists/{listId}/operations<br>/v1.0/sites/{siteId}/lists/{listId}/operations/{richLongRunningOperation-ID}<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}/columns<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}/columns<br>/v1.0/sites/{siteId}/contentTypes/{contentTypeId}/isPublished<br>/v1.0/sites/{siteId}/lists/{listId}/contentTypes/getCompatibleHubContentTypes<br>/v1.0/sites/{siteId}/contentTypes/getCompatibleHubContentTypes<br>/v1.0/sites/{site-id}/items/{item-id}/versions<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}/versions<br>/v1.0/sites/{site-id}/analytics/allTime<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}/analytics/allTime<br>/v1.0/drives/{drive-id}/items/{item-id}/analytics/lastSevenDays<br>/v1.0/sites/{site-id}/analytics/lastSevenDays<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}/analytics/lastSevenDays<br>/v1.0/sites/{siteId}/lists/{listId}/items/{itemId}/documentSetVersions<br>/v1.0/sites/{siteId}/lists/{listId}/items/{itemId}/documentSetVersions/{documentSetVersionId}<br>/v1.0/sites/{site-id}/termStore<br>/v1.0/sites/{site-id}/termStore/groups<br>/v1.0/sites/{site-id}/termStore/groups/{group-id}<br>/v1.0/sites/{site-id}/termStore/groups/{group-id}/sets<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/children<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/terms/{term-id}/children<br>/v1.0/sites/{site-id}/termStore/groups/{group-id}/sets/{set-id}/terms/{term-id}<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/terms/{term-id}<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/relations<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/terms/{term-id}/relations<br>/v1.0/admin/sharepoint/settings<br>/v1.0/sites/{sitesId}/permissions<br>/v1.0/users/{user-id}/followedSites/add<br>/v1.0/users/{user-id}/followedSites/remove<br>/v1.0/sites/{site-id}/columns<br>/v1.0/sites/{site-id}/contentTypes<br>/v1.0/sites/{site-id}/lists<br>/v1.0/sites/{site-id}/lists/{list-id}/columns<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/addCopy<br>/v1.0/sites/{siteId}/contentTypes/{contentTypeId}/publish<br>/v1.0/sites/{siteId}/contentTypes/{contentTypeId}/unpublish<br>/v1.0/sites/{siteId}/lists/{listId}/contentTypes/addCopyFromContentTypeHub<br>/v1.0/sites/{siteId}/contentTypes/addCopyFromContentTypeHub<br>/v1.0/sites/{siteId}/contentTypes/{contentTypeId}/associateWithHubSites<br>/v1.0/sites/{siteId}/contentTypes/{contentTypeId}/copyToDefaultContentLocation<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}/columns<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}/column<br>/v1.0/sites/{site-id}/lists/{list-id}/items<br>/v1.0/sites/{siteId}/lists/{listId}/items/{itemId}/documentSetVersions<br>/v1.0/sites/{siteId}/lists/{listId}/items/{itemId}/documentSetVersions/{documentSetVersionId}/restore<br>/v1.0/sites/{site-id}/termStore/groups<br>/v1.0/sites/{site-id}/termStore/sets<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/terms/{term-id}/children<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/children<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/terms/{term-id}/relations<br>/v1.0/sites/{sitesId}/permissions/{permissionId}<br>/v1.0/sites/{site-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}/fields<br>/v1.0/sites/{site-id}/termStore<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/terms/{term-id}<br>/v1.0/admin/sharepoint/settings<br>/v1.0/sites/{site-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}<br>/v1.0/sites/{siteId}/lists/{listId}/items/{itemId}/documentSetVersions/{documentSetVersionId}<br>/v1.0/sites/{site-id}/termStore/groups/{group-id}<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/terms/{term-id}<br></strong></i>
+            <i><strong>/v1.0/sites/{sitesId}/permissions/{permissionId}<br>/v1.0/sites/{sitesId}/permissions<br>/v1.0/sites/{hostname}/{site-relative-path}<br>/v1.0/sites<br>/v1.0/sites/{site-id}/lists<br>/v1.0/sites/{site-id}/lists/{list-id}<br>/v1.0/me/followedSites<br>/v1.0/sites/{site-id}/columns<br>/v1.0/sites/{site-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/contentTypes<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}<br>/v1.0/sites/{siteId}/getApplicableContentTypesForList<br>/v1.0/sites/{site-id}/sites<br>/v1.0/sites/{siteId}/operations<br>/v1.0/sites/{siteId}/operations/{richLongRunningOperation-ID}<br>/v1.0/sites/getAllSites<br>/v1.0/sites/{site-id}/lists/{list-id}/items<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/columns<br>/v1.0/sites/{site-id}/lists/{list-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}<br>/v1.0/sites/{siteId}/lists/{listId}/operations<br>/v1.0/sites/{siteId}/lists/{listId}/operations/{richLongRunningOperation-ID}<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/contentTypes/{contentType-id}/columns<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}/columns/{column-id}<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}/columns<br>/v1.0/sites/{siteId}/contentTypes/{contentTypeId}/isPublished<br>/v1.0/sites/{siteId}/lists/{listId}/contentTypes/getCompatibleHubContentTypes<br>/v1.0/sites/{siteId}/contentTypes/getCompatibleHubContentTypes<br>/v1.0/sites/{site-id}/items/{item-id}/versions<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}/versions<br>/v1.0/sites/{site-id}/analytics/allTime<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}/analytics/allTime<br>/v1.0/drives/{drive-id}/items/{item-id}/analytics/lastSevenDays<br>/v1.0/sites/{site-id}/analytics/lastSevenDays<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}/analytics/lastSevenDays<br>/v1.0/sites/{siteId}/lists/{listId}/items/{itemId}/documentSetVersions<br>/v1.0/sites/{siteId}/lists/{listId}/items/{itemId}/documentSetVersions/{documentSetVersionId}<br>/v1.0/sites/{site-id}/termStore<br>/v1.0/sites/{site-id}/termStore/groups<br>/v1.0/sites/{site-id}/termStore/groups/{group-id}<br>/v1.0/sites/{site-id}/termStore/groups/{group-id}/sets<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/children<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/terms/{term-id}/children<br>/v1.0/sites/{site-id}/termStore/groups/{group-id}/sets/{set-id}/terms/{term-id}<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/terms/{term-id}<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/relations<br>/v1.0/sites/{site-id}/termStore/sets/{set-id}/terms/{term-id}/relations<br>/v1.0/admin/sharepoint/settings<br>/v1.0/users/{user-id}/followedSites/add<br>/v1.0/users/{user-id}/followedSites/remove<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/addCopy<br>/v1.0/sites/{siteId}/contentTypes/{contentTypeId}/publish<br>/v1.0/sites/{siteId}/contentTypes/{contentTypeId}/unpublish<br>/v1.0/sites/{siteId}/lists/{listId}/contentTypes/addCopyFromContentTypeHub<br>/v1.0/sites/{siteId}/contentTypes/addCopyFromContentTypeHub<br>/v1.0/sites/{siteId}/contentTypes/{contentTypeId}/associateWithHubSites<br>/v1.0/sites/{siteId}/contentTypes/{contentTypeId}/copyToDefaultContentLocation<br>/v1.0/sites/{site-id}/lists/{list-id}/contentTypes/{contentType-id}/column<br>/v1.0/sites/{siteId}/lists/{listId}/items/{itemId}/documentSetVersions/{documentSetVersionId}/restore<br>/v1.0/sites/{site-id}/termStore/sets<br>/v1.0/sites/{site-id}/lists/{list-id}/items/{item-id}/fields</strong></i>
         </td>
     </tr>
     <tr>
@@ -843,14 +843,14 @@ Description of Custom Flow Steps
 
 ## Dependencies
 * HTTP Service (Latest Version)
-* Oauth Package (v1.0.10)
+* Oauth Package (v1.0.18)
 
-## About SLINGR
+# About SLINGR
 
 SLINGR is a low-code rapid application development platform that accelerates development, with robust architecture for integrations and executing custom workflows and automation.
 
 [More info about SLINGR](https://slingr.io)
 
-## License
+# License
 
 This package is licensed under the Apache License 2.0. See the `LICENSE` file for more details.

@@ -2,17 +2,37 @@
  Dependencies
  ****************************************************/
 
-var httpService = dependencies.http;
+var httpReference = dependencies.http;
+
+var httpDependency = {
+    get: httpReference.get,
+    post: httpReference.post,
+    put: httpReference.put,
+    patch: httpReference.patch,
+    delete: httpReference.delete,
+    head: httpReference.head,
+    options: httpReference.options
+};
+var httpService = {};
 
 function handleRequestWithRetry(requestFn, options, callbackData, callbacks) {
-    sys.logs.info("Call function handleRequestWithRetry");
     try {
         return requestFn(options, callbackData, callbacks);
     } catch (error) {
-        sys.logs.info("[sharepoint] Handling request with retry "+ JSON.stringify(error));
+        sys.logs.info("[sharepoint] Handling request "+JSON.stringify(error));
         dependencies.oauth.functions.refreshToken('sharepoint:refreshToken');
         return requestFn(setAuthorization(options), callbackData, callbacks);
     }
+}
+
+function createWrapperFunction(requestFn) {
+    return function(options, callbackData, callbacks) {
+        return handleRequestWithRetry(requestFn, options, callbackData, callbacks);
+    };
+}
+
+for (var key in httpDependency) {
+    if (typeof httpDependency[key] === 'function') httpService[key] = createWrapperFunction(httpDependency[key]);
 }
 
 exports.getAccessToken = function () {
@@ -151,33 +171,33 @@ exports.admin.sharepoint = {};
 
 exports.admin.sharepoint.settings = {};
 
-exports.sites.permissions.get = function (sitesId, permissionId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.permissions.get = function(sitesId, permissionId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 2:
-            url = parse('/v1.0/sites/:sitesId/permissions/:permissionId', [sitesId, permissionId]);
-            break;
-        case 1:
-            url = parse('/v1.0/sites/:sitesId/permissions', [sitesId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:sitesId/permissions/:permissionId', [sitesId, permissionId]);
+			break;
+		case 1:
+			url = parse('/v1.0/sites/:sitesId/permissions', [sitesId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.permissions.post = function (sitesId, httpOptions) {
+exports.sites.permissions.post = function(sitesId, httpOptions) {
     if (!sitesId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [sitesId].');
         return;
@@ -185,10 +205,10 @@ exports.sites.permissions.post = function (sitesId, httpOptions) {
     var url = parse('/v1.0/sites/:sitesId/permissions', [sitesId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.permissions.patch = function (sitesId, permissionId, httpOptions) {
+exports.sites.permissions.patch = function(sitesId, permissionId, httpOptions) {
     if (!sitesId || !permissionId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [sitesId,permissionId].');
         return;
@@ -196,69 +216,69 @@ exports.sites.permissions.patch = function (sitesId, permissionId, httpOptions) 
     var url = parse('/v1.0/sites/:sitesId/permissions/:permissionId', [sitesId, permissionId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.get = function (hostname, siteRelativePath, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.get = function(hostname, siteRelativePath, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 2:
-            url = parse('/v1.0/sites/:hostname/:site-relative-path', [hostname, siteRelativePath]);
-            break;
-        case 0:
-            url = parse('/v1.0/sites');
-            break;
-        default:
+			url = parse('/v1.0/sites/:hostname/:site-relative-path', [hostname, siteRelativePath]);
+			break;
+		case 0:
+			url = parse('/v1.0/sites');
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.get = function (siteId, listId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.lists.get = function(siteId, listId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 1:
-            url = parse('/v1.0/sites/:site-id/lists', [siteId]);
-            break;
-        case 2:
-            url = parse('/v1.0/sites/:site-id/lists/:list-id', [siteId, listId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:site-id/lists', [siteId]);
+			break;
+		case 2:
+			url = parse('/v1.0/sites/:site-id/lists/:list-id', [siteId, listId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.me.followedSites.get = function (httpOptions) {
+exports.me.followedSites.get = function(httpOptions) {
     var url = parse('/v1.0/me/followedSites');
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.users.followedSites.add.post = function (userId, httpOptions) {
+exports.users.followedSites.add.post = function(userId, httpOptions) {
     if (!userId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [userId].');
         return;
@@ -266,10 +286,10 @@ exports.users.followedSites.add.post = function (userId, httpOptions) {
     var url = parse('/v1.0/users/:user-id/followedSites/add', [userId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.users.followedSites.remove.post = function (userId, httpOptions) {
+exports.users.followedSites.remove.post = function(userId, httpOptions) {
     if (!userId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [userId].');
         return;
@@ -277,36 +297,36 @@ exports.users.followedSites.remove.post = function (userId, httpOptions) {
     var url = parse('/v1.0/users/:user-id/followedSites/remove', [userId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.columns.get = function (siteId, columnId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.columns.get = function(siteId, columnId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 1:
-            url = parse('/v1.0/sites/:site-id/columns', [siteId]);
-            break;
-        case 2:
-            url = parse('/v1.0/sites/:site-id/columns/:column-id', [siteId, columnId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:site-id/columns', [siteId]);
+			break;
+		case 2:
+			url = parse('/v1.0/sites/:site-id/columns/:column-id', [siteId, columnId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.columns.post = function (siteId, httpOptions) {
+exports.sites.columns.post = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -314,36 +334,36 @@ exports.sites.columns.post = function (siteId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/columns', [siteId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.contentTypes.get = function (siteId, contentTypeId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.contentTypes.get = function(siteId, contentTypeId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 1:
-            url = parse('/v1.0/sites/:site-id/contentTypes', [siteId]);
-            break;
-        case 2:
-            url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id', [siteId, contentTypeId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:site-id/contentTypes', [siteId]);
+			break;
+		case 2:
+			url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id', [siteId, contentTypeId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.contentTypes.post = function (siteId, httpOptions) {
+exports.sites.contentTypes.post = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -351,10 +371,10 @@ exports.sites.contentTypes.post = function (siteId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/contentTypes', [siteId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.getApplicableContentTypesForList.get = function (siteId, httpOptions) {
+exports.sites.getApplicableContentTypesForList.get = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -362,10 +382,10 @@ exports.sites.getApplicableContentTypesForList.get = function (siteId, httpOptio
     var url = parse('/v1.0/sites/:siteId/getApplicableContentTypesForList', [siteId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.post = function (siteId, httpOptions) {
+exports.sites.lists.post = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -373,10 +393,10 @@ exports.sites.lists.post = function (siteId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/lists', [siteId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.sites.get = function (siteId, httpOptions) {
+exports.sites.sites.get = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -384,95 +404,95 @@ exports.sites.sites.get = function (siteId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/sites', [siteId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.operations.get = function (siteId, richLongRunningOperationID, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.operations.get = function(siteId, richLongRunningOperationID, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 1:
-            url = parse('/v1.0/sites/:siteId/operations', [siteId]);
-            break;
-        case 2:
-            url = parse('/v1.0/sites/:siteId/operations/:richLongRunningOperation-ID', [siteId, richLongRunningOperationID]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:siteId/operations', [siteId]);
+			break;
+		case 2:
+			url = parse('/v1.0/sites/:siteId/operations/:richLongRunningOperation-ID', [siteId, richLongRunningOperationID]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.getAllSites.get = function (httpOptions) {
+exports.sites.getAllSites.get = function(httpOptions) {
     var url = parse('/v1.0/sites/getAllSites');
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.items.get = function (siteId, listId, itemId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.lists.items.get = function(siteId, listId, itemId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 2:
-            url = parse('/v1.0/sites/:site-id/lists/:list-id/items', [siteId, listId]);
-            break;
-        case 3:
-            url = parse('/v1.0/sites/:site-id/lists/:list-id/items/:item-id', [siteId, listId, itemId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:site-id/lists/:list-id/items', [siteId, listId]);
+			break;
+		case 3:
+			url = parse('/v1.0/sites/:site-id/lists/:list-id/items/:item-id', [siteId, listId, itemId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.columns.get = function (siteId, listId, columnId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.lists.columns.get = function(siteId, listId, columnId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 2:
-            url = parse('/v1.0/sites/:site-id/lists/:list-id/columns', [siteId, listId]);
-            break;
-        case 3:
-            url = parse('/v1.0/sites/:site-id/lists/:list-id/columns/:column-id', [siteId, listId, columnId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:site-id/lists/:list-id/columns', [siteId, listId]);
+			break;
+		case 3:
+			url = parse('/v1.0/sites/:site-id/lists/:list-id/columns/:column-id', [siteId, listId, columnId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.columns.post = function (siteId, listId, httpOptions) {
+exports.sites.lists.columns.post = function(siteId, listId, httpOptions) {
     if (!siteId || !listId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId].');
         return;
@@ -480,36 +500,36 @@ exports.sites.lists.columns.post = function (siteId, listId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/columns', [siteId, listId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.lists.contentTypes.get = function (siteId, listId, contentTypeId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.lists.contentTypes.get = function(siteId, listId, contentTypeId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 2:
-            url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes', [siteId, listId]);
-            break;
-        case 3:
-            url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id', [siteId, listId, contentTypeId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes', [siteId, listId]);
+			break;
+		case 3:
+			url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id', [siteId, listId, contentTypeId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.contentTypes.addCopy.post = function (siteId, listId, httpOptions) {
+exports.sites.lists.contentTypes.addCopy.post = function(siteId, listId, httpOptions) {
     if (!siteId || !listId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId].');
         return;
@@ -517,88 +537,88 @@ exports.sites.lists.contentTypes.addCopy.post = function (siteId, listId, httpOp
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/addCopy', [siteId, listId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.lists.operations.get = function (siteId, listId, richLongRunningOperationID, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.lists.operations.get = function(siteId, listId, richLongRunningOperationID, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 2:
-            url = parse('/v1.0/sites/:siteId/lists/:listId/operations', [siteId, listId]);
-            break;
-        case 3:
-            url = parse('/v1.0/sites/:siteId/lists/:listId/operations/:richLongRunningOperation-ID', [siteId, listId, richLongRunningOperationID]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:siteId/lists/:listId/operations', [siteId, listId]);
+			break;
+		case 3:
+			url = parse('/v1.0/sites/:siteId/lists/:listId/operations/:richLongRunningOperation-ID', [siteId, listId, richLongRunningOperationID]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.contentTypes.columns.get = function (siteId, contentTypeId, columnId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.contentTypes.columns.get = function(siteId, contentTypeId, columnId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 3:
-            url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id/columns/:column-id', [siteId, contentTypeId, columnId]);
-            break;
-        case 2:
-            url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id/columns', [siteId, contentTypeId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id/columns/:column-id', [siteId, contentTypeId, columnId]);
+			break;
+		case 2:
+			url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id/columns', [siteId, contentTypeId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.contentTypes.columns.get = function (siteId, listId, contentTypeId, columnId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.lists.contentTypes.columns.get = function(siteId, listId, contentTypeId, columnId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 4:
-            url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns/:column-id', [siteId, listId, contentTypeId, columnId]);
-            break;
-        case 3:
-            url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns', [siteId, listId, contentTypeId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns/:column-id', [siteId, listId, contentTypeId, columnId]);
+			break;
+		case 3:
+			url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns', [siteId, listId, contentTypeId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.columns.patch = function (siteId, columnId, httpOptions) {
+exports.sites.columns.patch = function(siteId, columnId, httpOptions) {
     if (!siteId || !columnId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,columnId].');
         return;
@@ -606,10 +626,10 @@ exports.sites.columns.patch = function (siteId, columnId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/columns/:column-id', [siteId, columnId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.lists.columns.patch = function (siteId, listId, columnId, httpOptions) {
+exports.sites.lists.columns.patch = function(siteId, listId, columnId, httpOptions) {
     if (!siteId || !listId || !columnId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,columnId].');
         return;
@@ -617,10 +637,10 @@ exports.sites.lists.columns.patch = function (siteId, listId, columnId, httpOpti
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/columns/:column-id', [siteId, listId, columnId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.contentTypes.columns.patch = function (siteId, contentTypeId, columnId, httpOptions) {
+exports.sites.contentTypes.columns.patch = function(siteId, contentTypeId, columnId, httpOptions) {
     if (!siteId || !contentTypeId || !columnId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,contentTypeId,columnId].');
         return;
@@ -628,10 +648,10 @@ exports.sites.contentTypes.columns.patch = function (siteId, contentTypeId, colu
     var url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id/columns/:column-id', [siteId, contentTypeId, columnId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.lists.contentTypes.columns.patch = function (siteId, listId, contentTypeId, columnId, httpOptions) {
+exports.sites.lists.contentTypes.columns.patch = function(siteId, listId, contentTypeId, columnId, httpOptions) {
     if (!siteId || !listId || !contentTypeId || !columnId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,contentTypeId,columnId].');
         return;
@@ -639,10 +659,10 @@ exports.sites.lists.contentTypes.columns.patch = function (siteId, listId, conte
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns/:column-id', [siteId, listId, contentTypeId, columnId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.columns.delete = function (siteId, columnId, httpOptions) {
+exports.sites.columns.delete = function(siteId, columnId, httpOptions) {
     if (!siteId || !columnId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,columnId].');
         return;
@@ -650,10 +670,10 @@ exports.sites.columns.delete = function (siteId, columnId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/columns/:column-id', [siteId, columnId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.lists.columns.delete = function (siteId, listId, columnId, httpOptions) {
+exports.sites.lists.columns.delete = function(siteId, listId, columnId, httpOptions) {
     if (!siteId || !listId || !columnId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,columnId].');
         return;
@@ -661,10 +681,10 @@ exports.sites.lists.columns.delete = function (siteId, listId, columnId, httpOpt
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/columns/:column-id', [siteId, listId, columnId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.contentTypes.columns.delete = function (siteId, contentTypeId, columnId, httpOptions) {
+exports.sites.contentTypes.columns.delete = function(siteId, contentTypeId, columnId, httpOptions) {
     if (!siteId || !contentTypeId || !columnId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,contentTypeId,columnId].');
         return;
@@ -672,10 +692,10 @@ exports.sites.contentTypes.columns.delete = function (siteId, contentTypeId, col
     var url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id/columns/:column-id', [siteId, contentTypeId, columnId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.lists.contentTypes.columns.delete = function (siteId, listId, contentTypeId, columnId, httpOptions) {
+exports.sites.lists.contentTypes.columns.delete = function(siteId, listId, contentTypeId, columnId, httpOptions) {
     if (!siteId || !listId || !contentTypeId || !columnId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,contentTypeId,columnId].');
         return;
@@ -683,10 +703,10 @@ exports.sites.lists.contentTypes.columns.delete = function (siteId, listId, cont
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/columns/:column-id', [siteId, listId, contentTypeId, columnId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.contentTypes.patch = function (siteId, contentTypeId, httpOptions) {
+exports.sites.contentTypes.patch = function(siteId, contentTypeId, httpOptions) {
     if (!siteId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,contentTypeId].');
         return;
@@ -694,10 +714,10 @@ exports.sites.contentTypes.patch = function (siteId, contentTypeId, httpOptions)
     var url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id', [siteId, contentTypeId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.lists.contentTypes.patch = function (siteId, listId, contentTypeId, httpOptions) {
+exports.sites.lists.contentTypes.patch = function(siteId, listId, contentTypeId, httpOptions) {
     if (!siteId || !listId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,contentTypeId].');
         return;
@@ -705,10 +725,10 @@ exports.sites.lists.contentTypes.patch = function (siteId, listId, contentTypeId
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id', [siteId, listId, contentTypeId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.contentTypes.delete = function (siteId, contentTypeId, httpOptions) {
+exports.sites.contentTypes.delete = function(siteId, contentTypeId, httpOptions) {
     if (!siteId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,contentTypeId].');
         return;
@@ -716,10 +736,10 @@ exports.sites.contentTypes.delete = function (siteId, contentTypeId, httpOptions
     var url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id', [siteId, contentTypeId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.lists.contentTypes.delete = function (siteId, listId, contentTypeId, httpOptions) {
+exports.sites.lists.contentTypes.delete = function(siteId, listId, contentTypeId, httpOptions) {
     if (!siteId || !listId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,contentTypeId].');
         return;
@@ -727,10 +747,10 @@ exports.sites.lists.contentTypes.delete = function (siteId, listId, contentTypeI
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id', [siteId, listId, contentTypeId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.contentTypes.isPublished.get = function (siteId, contentTypeId, httpOptions) {
+exports.sites.contentTypes.isPublished.get = function(siteId, contentTypeId, httpOptions) {
     if (!siteId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,contentTypeId].');
         return;
@@ -738,10 +758,10 @@ exports.sites.contentTypes.isPublished.get = function (siteId, contentTypeId, ht
     var url = parse('/v1.0/sites/:siteId/contentTypes/:contentTypeId/isPublished', [siteId, contentTypeId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.contentTypes.publish.post = function (siteId, contentTypeId, httpOptions) {
+exports.sites.contentTypes.publish.post = function(siteId, contentTypeId, httpOptions) {
     if (!siteId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,contentTypeId].');
         return;
@@ -749,10 +769,10 @@ exports.sites.contentTypes.publish.post = function (siteId, contentTypeId, httpO
     var url = parse('/v1.0/sites/:siteId/contentTypes/:contentTypeId/publish', [siteId, contentTypeId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.contentTypes.unpublish.post = function (siteId, contentTypeId, httpOptions) {
+exports.sites.contentTypes.unpublish.post = function(siteId, contentTypeId, httpOptions) {
     if (!siteId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,contentTypeId].');
         return;
@@ -760,10 +780,10 @@ exports.sites.contentTypes.unpublish.post = function (siteId, contentTypeId, htt
     var url = parse('/v1.0/sites/:siteId/contentTypes/:contentTypeId/unpublish', [siteId, contentTypeId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.lists.contentTypes.addCopyFromContentTypeHub.post = function (siteId, listId, httpOptions) {
+exports.sites.lists.contentTypes.addCopyFromContentTypeHub.post = function(siteId, listId, httpOptions) {
     if (!siteId || !listId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId].');
         return;
@@ -771,10 +791,10 @@ exports.sites.lists.contentTypes.addCopyFromContentTypeHub.post = function (site
     var url = parse('/v1.0/sites/:siteId/lists/:listId/contentTypes/addCopyFromContentTypeHub', [siteId, listId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.contentTypes.addCopyFromContentTypeHub.post = function (siteId, httpOptions) {
+exports.sites.contentTypes.addCopyFromContentTypeHub.post = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -782,10 +802,10 @@ exports.sites.contentTypes.addCopyFromContentTypeHub.post = function (siteId, ht
     var url = parse('/v1.0/sites/:siteId/contentTypes/addCopyFromContentTypeHub', [siteId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.contentTypes.associateWithHubSites.post = function (siteId, contentTypeId, httpOptions) {
+exports.sites.contentTypes.associateWithHubSites.post = function(siteId, contentTypeId, httpOptions) {
     if (!siteId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,contentTypeId].');
         return;
@@ -793,10 +813,10 @@ exports.sites.contentTypes.associateWithHubSites.post = function (siteId, conten
     var url = parse('/v1.0/sites/:siteId/contentTypes/:contentTypeId/associateWithHubSites', [siteId, contentTypeId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.contentTypes.copyToDefaultContentLocation.post = function (siteId, contentTypeId, httpOptions) {
+exports.sites.contentTypes.copyToDefaultContentLocation.post = function(siteId, contentTypeId, httpOptions) {
     if (!siteId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,contentTypeId].');
         return;
@@ -804,10 +824,10 @@ exports.sites.contentTypes.copyToDefaultContentLocation.post = function (siteId,
     var url = parse('/v1.0/sites/:siteId/contentTypes/:contentTypeId/copyToDefaultContentLocation', [siteId, contentTypeId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.contentTypes.columns.post = function (siteId, contentTypeId, httpOptions) {
+exports.sites.contentTypes.columns.post = function(siteId, contentTypeId, httpOptions) {
     if (!siteId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,contentTypeId].');
         return;
@@ -815,10 +835,10 @@ exports.sites.contentTypes.columns.post = function (siteId, contentTypeId, httpO
     var url = parse('/v1.0/sites/:site-id/contentTypes/:contentType-id/columns', [siteId, contentTypeId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.lists.contentTypes.column.post = function (siteId, listId, contentTypeId, httpOptions) {
+exports.sites.lists.contentTypes.column.post = function(siteId, listId, contentTypeId, httpOptions) {
     if (!siteId || !listId || !contentTypeId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,contentTypeId].');
         return;
@@ -826,10 +846,10 @@ exports.sites.lists.contentTypes.column.post = function (siteId, listId, content
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/contentTypes/:contentType-id/column', [siteId, listId, contentTypeId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.lists.contentTypes.getCompatibleHubContentTypes.get = function (siteId, listId, httpOptions) {
+exports.sites.lists.contentTypes.getCompatibleHubContentTypes.get = function(siteId, listId, httpOptions) {
     if (!siteId || !listId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId].');
         return;
@@ -837,10 +857,10 @@ exports.sites.lists.contentTypes.getCompatibleHubContentTypes.get = function (si
     var url = parse('/v1.0/sites/:siteId/lists/:listId/contentTypes/getCompatibleHubContentTypes', [siteId, listId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.contentTypes.getCompatibleHubContentTypes.get = function (siteId, httpOptions) {
+exports.sites.contentTypes.getCompatibleHubContentTypes.get = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -848,10 +868,10 @@ exports.sites.contentTypes.getCompatibleHubContentTypes.get = function (siteId, 
     var url = parse('/v1.0/sites/:siteId/contentTypes/getCompatibleHubContentTypes', [siteId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.items.post = function (siteId, listId, httpOptions) {
+exports.sites.lists.items.post = function(siteId, listId, httpOptions) {
     if (!siteId || !listId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId].');
         return;
@@ -859,10 +879,10 @@ exports.sites.lists.items.post = function (siteId, listId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/items', [siteId, listId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.lists.items.patch = function (siteId, listId, itemId, httpOptions) {
+exports.sites.lists.items.patch = function(siteId, listId, itemId, httpOptions) {
     if (!siteId || !listId || !itemId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,itemId].');
         return;
@@ -870,10 +890,10 @@ exports.sites.lists.items.patch = function (siteId, listId, itemId, httpOptions)
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/items/:item-id', [siteId, listId, itemId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.lists.items.fields.patch = function (siteId, listId, itemId, httpOptions) {
+exports.sites.lists.items.fields.patch = function(siteId, listId, itemId, httpOptions) {
     if (!siteId || !listId || !itemId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,itemId].');
         return;
@@ -881,10 +901,10 @@ exports.sites.lists.items.fields.patch = function (siteId, listId, itemId, httpO
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/items/:item-id/fields', [siteId, listId, itemId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.lists.items.delete = function (siteId, listId, itemId, httpOptions) {
+exports.sites.lists.items.delete = function(siteId, listId, itemId, httpOptions) {
     if (!siteId || !listId || !itemId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,itemId].');
         return;
@@ -892,10 +912,10 @@ exports.sites.lists.items.delete = function (siteId, listId, itemId, httpOptions
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/items/:item-id', [siteId, listId, itemId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.items.versions.get = function (siteId, itemId, httpOptions) {
+exports.sites.items.versions.get = function(siteId, itemId, httpOptions) {
     if (!siteId || !itemId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,itemId].');
         return;
@@ -903,10 +923,10 @@ exports.sites.items.versions.get = function (siteId, itemId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/items/:item-id/versions', [siteId, itemId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.items.versions.get = function (siteId, listId, itemId, httpOptions) {
+exports.sites.lists.items.versions.get = function(siteId, listId, itemId, httpOptions) {
     if (!siteId || !listId || !itemId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,itemId].');
         return;
@@ -914,10 +934,10 @@ exports.sites.lists.items.versions.get = function (siteId, listId, itemId, httpO
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/items/:item-id/versions', [siteId, listId, itemId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.analytics.allTime.get = function (siteId, httpOptions) {
+exports.sites.analytics.allTime.get = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -925,10 +945,10 @@ exports.sites.analytics.allTime.get = function (siteId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/analytics/allTime', [siteId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.items.analytics.allTime.get = function (siteId, listId, itemId, httpOptions) {
+exports.sites.lists.items.analytics.allTime.get = function(siteId, listId, itemId, httpOptions) {
     if (!siteId || !listId || !itemId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,itemId].');
         return;
@@ -936,10 +956,10 @@ exports.sites.lists.items.analytics.allTime.get = function (siteId, listId, item
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/items/:item-id/analytics/allTime', [siteId, listId, itemId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.drives.items.analytics.lastSevenDays.get = function (driveId, itemId, httpOptions) {
+exports.drives.items.analytics.lastSevenDays.get = function(driveId, itemId, httpOptions) {
     if (!driveId || !itemId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [driveId,itemId].');
         return;
@@ -947,10 +967,10 @@ exports.drives.items.analytics.lastSevenDays.get = function (driveId, itemId, ht
     var url = parse('/v1.0/drives/:drive-id/items/:item-id/analytics/lastSevenDays', [driveId, itemId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.analytics.lastSevenDays.get = function (siteId, httpOptions) {
+exports.sites.analytics.lastSevenDays.get = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -958,10 +978,10 @@ exports.sites.analytics.lastSevenDays.get = function (siteId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/analytics/lastSevenDays', [siteId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.items.analytics.lastSevenDays.get = function (siteId, listId, itemId, httpOptions) {
+exports.sites.lists.items.analytics.lastSevenDays.get = function(siteId, listId, itemId, httpOptions) {
     if (!siteId || !listId || !itemId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,itemId].');
         return;
@@ -969,36 +989,36 @@ exports.sites.lists.items.analytics.lastSevenDays.get = function (siteId, listId
     var url = parse('/v1.0/sites/:site-id/lists/:list-id/items/:item-id/analytics/lastSevenDays', [siteId, listId, itemId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.items.documentSetVersions.get = function (siteId, listId, itemId, documentSetVersionId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.lists.items.documentSetVersions.get = function(siteId, listId, itemId, documentSetVersionId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 3:
-            url = parse('/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions', [siteId, listId, itemId]);
-            break;
-        case 4:
-            url = parse('/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions/:documentSetVersionId', [siteId, listId, itemId, documentSetVersionId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions', [siteId, listId, itemId]);
+			break;
+		case 4:
+			url = parse('/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions/:documentSetVersionId', [siteId, listId, itemId, documentSetVersionId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.lists.items.documentSetVersions.post = function (siteId, listId, itemId, httpOptions) {
+exports.sites.lists.items.documentSetVersions.post = function(siteId, listId, itemId, httpOptions) {
     if (!siteId || !listId || !itemId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,itemId].');
         return;
@@ -1006,10 +1026,10 @@ exports.sites.lists.items.documentSetVersions.post = function (siteId, listId, i
     var url = parse('/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions', [siteId, listId, itemId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.lists.items.documentSetVersions.delete = function (siteId, listId, itemId, documentSetVersionId, httpOptions) {
+exports.sites.lists.items.documentSetVersions.delete = function(siteId, listId, itemId, documentSetVersionId, httpOptions) {
     if (!siteId || !listId || !itemId || !documentSetVersionId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,itemId,documentSetVersionId].');
         return;
@@ -1017,10 +1037,10 @@ exports.sites.lists.items.documentSetVersions.delete = function (siteId, listId,
     var url = parse('/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions/:documentSetVersionId', [siteId, listId, itemId, documentSetVersionId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.lists.items.documentSetVersions.restore.post = function (siteId, listId, itemId, documentSetVersionId, httpOptions) {
+exports.sites.lists.items.documentSetVersions.restore.post = function(siteId, listId, itemId, documentSetVersionId, httpOptions) {
     if (!siteId || !listId || !itemId || !documentSetVersionId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,listId,itemId,documentSetVersionId].');
         return;
@@ -1028,10 +1048,10 @@ exports.sites.lists.items.documentSetVersions.restore.post = function (siteId, l
     var url = parse('/v1.0/sites/:siteId/lists/:listId/items/:itemId/documentSetVersions/:documentSetVersionId/restore', [siteId, listId, itemId, documentSetVersionId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.termStore.get = function (siteId, httpOptions) {
+exports.sites.termStore.get = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -1039,10 +1059,10 @@ exports.sites.termStore.get = function (siteId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/termStore', [siteId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.termStore.patch = function (siteId, httpOptions) {
+exports.sites.termStore.patch = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -1050,36 +1070,36 @@ exports.sites.termStore.patch = function (siteId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/termStore', [siteId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.termStore.groups.get = function (siteId, groupId, httpOptions) {
-    if (!httpOptions) {
-        for (var i = 0; i < arguments.length; i++) {
-            if (isObject(arguments[i])) {
+exports.sites.termStore.groups.get = function(siteId, groupId, httpOptions) {
+    if(!httpOptions){
+        for (var i = 0 ; i < arguments.length; i++){
+            if (isObject(arguments[i])){
                 httpOptions = arguments[i];
                 arguments[i] = undefined;
             }
         }
     }
     var url;
-    switch (httpOptions ? arguments.length - 1 : arguments.length) {
+    switch(httpOptions ? arguments.length - 1 : arguments.length){
         case 1:
-            url = parse('/v1.0/sites/:site-id/termStore/groups', [siteId]);
-            break;
-        case 2:
-            url = parse('/v1.0/sites/:site-id/termStore/groups/:group-id', [siteId, groupId]);
-            break;
-        default:
+			url = parse('/v1.0/sites/:site-id/termStore/groups', [siteId]);
+			break;
+		case 2:
+			url = parse('/v1.0/sites/:site-id/termStore/groups/:group-id', [siteId, groupId]);
+			break;
+		default:
             sys.logs.error('Invalid argument received.');
             return;
     }
     sys.logs.debug('[sharepoint] GET from: ' + url);
-    var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+	var options = checkHttpOptions(url, httpOptions);
+	return httpService.get(Sharepoint(options));
 };
 
-exports.sites.termStore.groups.post = function (siteId, httpOptions) {
+exports.sites.termStore.groups.post = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -1087,10 +1107,10 @@ exports.sites.termStore.groups.post = function (siteId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/termStore/groups', [siteId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.termStore.groups.delete = function (siteId, groupId, httpOptions) {
+exports.sites.termStore.groups.delete = function(siteId, groupId, httpOptions) {
     if (!siteId || !groupId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,groupId].');
         return;
@@ -1098,10 +1118,10 @@ exports.sites.termStore.groups.delete = function (siteId, groupId, httpOptions) 
     var url = parse('/v1.0/sites/:site-id/termStore/groups/:group-id', [siteId, groupId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.termStore.groups.sets.get = function (siteId, groupId, httpOptions) {
+exports.sites.termStore.groups.sets.get = function(siteId, groupId, httpOptions) {
     if (!siteId || !groupId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,groupId].');
         return;
@@ -1109,10 +1129,10 @@ exports.sites.termStore.groups.sets.get = function (siteId, groupId, httpOptions
     var url = parse('/v1.0/sites/:site-id/termStore/groups/:group-id/sets', [siteId, groupId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.post = function (siteId, httpOptions) {
+exports.sites.termStore.sets.post = function(siteId, httpOptions) {
     if (!siteId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId].');
         return;
@@ -1120,10 +1140,10 @@ exports.sites.termStore.sets.post = function (siteId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/termStore/sets', [siteId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.get = function (siteId, setId, httpOptions) {
+exports.sites.termStore.sets.get = function(siteId, setId, httpOptions) {
     if (!siteId || !setId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId].');
         return;
@@ -1131,10 +1151,10 @@ exports.sites.termStore.sets.get = function (siteId, setId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id', [siteId, setId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.patch = function (siteId, setId, httpOptions) {
+exports.sites.termStore.sets.patch = function(siteId, setId, httpOptions) {
     if (!siteId || !setId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId].');
         return;
@@ -1142,10 +1162,10 @@ exports.sites.termStore.sets.patch = function (siteId, setId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id', [siteId, setId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.delete = function (siteId, setId, httpOptions) {
+exports.sites.termStore.sets.delete = function(siteId, setId, httpOptions) {
     if (!siteId || !setId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId].');
         return;
@@ -1153,10 +1173,10 @@ exports.sites.termStore.sets.delete = function (siteId, setId, httpOptions) {
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id', [siteId, setId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.children.get = function (siteId, setId, httpOptions) {
+exports.sites.termStore.sets.children.get = function(siteId, setId, httpOptions) {
     if (!siteId || !setId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId].');
         return;
@@ -1164,10 +1184,10 @@ exports.sites.termStore.sets.children.get = function (siteId, setId, httpOptions
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id/children', [siteId, setId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.terms.children.get = function (siteId, setId, termId, httpOptions) {
+exports.sites.termStore.sets.terms.children.get = function(siteId, setId, termId, httpOptions) {
     if (!siteId || !setId || !termId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId,termId].');
         return;
@@ -1175,10 +1195,10 @@ exports.sites.termStore.sets.terms.children.get = function (siteId, setId, termI
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/children', [siteId, setId, termId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.terms.children.post = function (siteId, setId, termId, httpOptions) {
+exports.sites.termStore.sets.terms.children.post = function(siteId, setId, termId, httpOptions) {
     if (!siteId || !setId || !termId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId,termId].');
         return;
@@ -1186,10 +1206,10 @@ exports.sites.termStore.sets.terms.children.post = function (siteId, setId, term
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/children', [siteId, setId, termId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.children.post = function (siteId, setId, httpOptions) {
+exports.sites.termStore.sets.children.post = function(siteId, setId, httpOptions) {
     if (!siteId || !setId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId].');
         return;
@@ -1197,10 +1217,10 @@ exports.sites.termStore.sets.children.post = function (siteId, setId, httpOption
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id/children', [siteId, setId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.sites.termStore.groups.sets.terms.get = function (siteId, groupId, setId, termId, httpOptions) {
+exports.sites.termStore.groups.sets.terms.get = function(siteId, groupId, setId, termId, httpOptions) {
     if (!siteId || !groupId || !setId || !termId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,groupId,setId,termId].');
         return;
@@ -1208,10 +1228,10 @@ exports.sites.termStore.groups.sets.terms.get = function (siteId, groupId, setId
     var url = parse('/v1.0/sites/:site-id/termStore/groups/:group-id/sets/:set-id/terms/:term-id', [siteId, groupId, setId, termId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.terms.get = function (siteId, setId, termId, httpOptions) {
+exports.sites.termStore.sets.terms.get = function(siteId, setId, termId, httpOptions) {
     if (!siteId || !setId || !termId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId,termId].');
         return;
@@ -1219,10 +1239,10 @@ exports.sites.termStore.sets.terms.get = function (siteId, setId, termId, httpOp
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id', [siteId, setId, termId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.terms.patch = function (siteId, setId, termId, httpOptions) {
+exports.sites.termStore.sets.terms.patch = function(siteId, setId, termId, httpOptions) {
     if (!siteId || !setId || !termId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId,termId].');
         return;
@@ -1230,10 +1250,10 @@ exports.sites.termStore.sets.terms.patch = function (siteId, setId, termId, http
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id', [siteId, setId, termId]);
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.terms.delete = function (siteId, setId, termId, httpOptions) {
+exports.sites.termStore.sets.terms.delete = function(siteId, setId, termId, httpOptions) {
     if (!siteId || !setId || !termId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId,termId].');
         return;
@@ -1241,10 +1261,10 @@ exports.sites.termStore.sets.terms.delete = function (siteId, setId, termId, htt
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id', [siteId, setId, termId]);
     sys.logs.debug('[sharepoint] DELETE from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options));
+    return httpService.delete(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.relations.get = function (siteId, setId, httpOptions) {
+exports.sites.termStore.sets.relations.get = function(siteId, setId, httpOptions) {
     if (!siteId || !setId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId].');
         return;
@@ -1252,10 +1272,10 @@ exports.sites.termStore.sets.relations.get = function (siteId, setId, httpOption
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id/relations', [siteId, setId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.terms.relations.get = function (siteId, setId, termId, httpOptions) {
+exports.sites.termStore.sets.terms.relations.get = function(siteId, setId, termId, httpOptions) {
     if (!siteId || !setId || !termId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId,termId].');
         return;
@@ -1263,10 +1283,10 @@ exports.sites.termStore.sets.terms.relations.get = function (siteId, setId, term
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/relations', [siteId, setId, termId]);
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.sites.termStore.sets.terms.relations.post = function (siteId, setId, termId, httpOptions) {
+exports.sites.termStore.sets.terms.relations.post = function(siteId, setId, termId, httpOptions) {
     if (!siteId || !setId || !termId) {
         sys.logs.error('Invalid argument received. This helper should receive the following parameters as non-empty strings: [siteId,setId,termId].');
         return;
@@ -1274,65 +1294,65 @@ exports.sites.termStore.sets.terms.relations.post = function (siteId, setId, ter
     var url = parse('/v1.0/sites/:site-id/termStore/sets/:set-id/terms/:term-id/relations', [siteId, setId, termId]);
     sys.logs.debug('[sharepoint] POST from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options));
+    return httpService.post(Sharepoint(options));
 };
 
-exports.admin.sharepoint.settings.get = function (httpOptions) {
+exports.admin.sharepoint.settings.get = function(httpOptions) {
     var url = parse('/v1.0/admin/sharepoint/settings');
     sys.logs.debug('[sharepoint] GET from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options));
+    return httpService.get(Sharepoint(options));
 };
 
-exports.admin.sharepoint.settings.patch = function (httpOptions) {
+exports.admin.sharepoint.settings.patch = function(httpOptions) {
     var url = parse('/v1.0/admin/sharepoint/settings');
     sys.logs.debug('[sharepoint] PATCH from: ' + url);
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options));
+    return httpService.patch(Sharepoint(options));
 };
 
 /****************************************************
  Public API - Generic Functions
  ****************************************************/
 
-exports.get = function (url, httpOptions, callbackData, callbacks) {
+exports.get = function(url, httpOptions, callbackData, callbacks) {
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.get, Sharepoint(options), callbackData, callbacks);
+    return httpService.get(Sharepoint(options), callbackData, callbacks);
 };
 
-exports.post = function (url, httpOptions, callbackData, callbacks) {
+exports.post = function(url, httpOptions, callbackData, callbacks) {
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.post, Sharepoint(options), callbackData, callbacks);
+    return httpService.post(Sharepoint(options), callbackData, callbacks);
 };
 
-exports.put = function (url, httpOptions, callbackData, callbacks) {
+exports.put = function(url, httpOptions, callbackData, callbacks) {
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.put, Sharepoint(options), callbackData, callbacks);
+    return httpService.put(Sharepoint(options), callbackData, callbacks);
 };
 
-exports.patch = function (url, httpOptions, callbackData, callbacks) {
+exports.patch = function(url, httpOptions, callbackData, callbacks) {
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.patch, Sharepoint(options), callbackData, callbacks);
+    return httpService.patch(Sharepoint(options), callbackData, callbacks);
 };
 
-exports.delete = function (url, httpOptions, callbackData, callbacks) {
+exports.delete = function(url, httpOptions, callbackData, callbacks) {
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.delete, Sharepoint(options), callbackData, callbacks);
+    return httpService.delete(Sharepoint(options), callbackData, callbacks);
 };
 
-exports.head = function (url, httpOptions, callbackData, callbacks) {
+exports.head = function(url, httpOptions, callbackData, callbacks) {
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.head, Sharepoint(options), callbackData, callbacks);
+    return httpService.head(Sharepoint(options), callbackData, callbacks);
 };
 
-exports.options = function (url, httpOptions, callbackData, callbacks) {
+exports.options = function(url, httpOptions, callbackData, callbacks) {
     var options = checkHttpOptions(url, httpOptions);
-    return handleRequestWithRetry(httpService.options, Sharepoint(options), callbackData, callbacks);
+    return httpService.options(Sharepoint(options), callbackData, callbacks);
 };
 
 exports.utils = {};
 
-exports.utils.parseTimestamp = function (dateString) {
+exports.utils.parseTimestamp = function(dateString) {
     if (!dateString) {
         return null;
     }
@@ -1340,35 +1360,35 @@ exports.utils.parseTimestamp = function (dateString) {
     return new Date(dt[0], dt[1] - 1, dt[2], dt[3] || 0, dt[4] || 0, dt[5] || 0, 0);
 };
 
-exports.utils.formatTimestamp = function (date) {
+exports.utils.formatTimestamp = function(date) {
     if (!date) {
         return null;
     }
-    var pad = function (number) {
+    var pad = function(number) {
         var r = String(number);
-        if (r.length === 1) {
+        if ( r.length === 1 ) {
             r = '0' + r;
         }
         return r;
     };
     return date.getUTCFullYear()
-        + '-' + pad(date.getUTCMonth() + 1)
-        + '-' + pad(date.getUTCDate())
-        + 'T' + pad(date.getUTCHours())
-        + ':' + pad(date.getUTCMinutes())
-        + ':' + pad(date.getUTCSeconds())
-        + '.' + String((date.getUTCMilliseconds() / 1000).toFixed(3)).slice(2, 5)
+        + '-' + pad( date.getUTCMonth() + 1 )
+        + '-' + pad( date.getUTCDate() )
+        + 'T' + pad( date.getUTCHours() )
+        + ':' + pad( date.getUTCMinutes() )
+        + ':' + pad( date.getUTCSeconds() )
+        + '.' + String( (date.getUTCMilliseconds()/1000).toFixed(3) ).slice( 2, 5 )
         + 'Z';
 };
 
-exports.utils.fromDateToTimestamp = function (params) {
+exports.utils.fromDateToTimestamp = function(params) {
     if (!!params) {
         return {timestamp: new Date(params).getTime()};
     }
     return null;
 };
 
-exports.utils.fromMillisToDate = function (params) {
+exports.utils.fromMillisToDate = function(params) {
     if (!!params) {
         var sdf = new Intl.DateTimeFormat('en-US', {
             year: 'numeric', month: '2-digit', day: '2-digit',
@@ -1380,10 +1400,14 @@ exports.utils.fromMillisToDate = function (params) {
     return null;
 };
 
+exports.utils.getConfiguration = function (property) {
+    sys.logs.debug('[sharepoint] Get property: '+property);
+    return config.get(property);
+};
+
 /****************************************************
  Private helpers
  ****************************************************/
-
 
 var checkHttpOptions = function (url, options) {
     options = options || {};
@@ -1418,7 +1442,7 @@ var parse = function (str) {
         if (arguments.length > 1) {
             var args = arguments[1], i = 0;
             return str.replace(/(:(?:\w|-)+)/g, () => {
-                if (typeof (args[i]) != 'string') throw new Error('Invalid type of argument: [' + args[i] + '] for url [' + str + '].');
+                if (typeof (args[i]) != 'string' && typeof (args[i]) != 'number') throw new Error('Invalid type of argument: [' + args[i] + '] for url [' + str + '].');
                 return args[i++];
             });
         } else {
@@ -1432,13 +1456,6 @@ var parse = function (str) {
         throw err;
     }
 }
-
-/****************************************************
- Constants
- ****************************************************/
-
-var SHAREPOINT_API_BASE_URL = "https://graph.microsoft.com";
-var API_URL = SHAREPOINT_API_BASE_URL + "";
 
 /****************************************************
  Configurator
@@ -1458,7 +1475,7 @@ var Sharepoint = function (options) {
 
 function setApiUri(options) {
     var url = options.path || "";
-    options.url = API_URL + url;
+    options.url = config.get("SHAREPOINT_API_BASE_URL") + url;
     sys.logs.debug('[sharepoint] Set url: ' + options.path + "->" + options.url);
     delete options.path;
     return options;

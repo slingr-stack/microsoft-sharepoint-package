@@ -20,7 +20,7 @@ var httpService = dependencies.http;
  * {number} connectionTimeout, Read timeout interval, in milliseconds.
  * {number} readTimeout, Connect timeout interval, in milliseconds.
  */
-step.apiCall = function (inputs) {
+step.apiCallSharepoint = function (inputs) {
 
 	var inputsLogic = {
 		headers: inputs.headers || [],
@@ -45,7 +45,7 @@ step.apiCall = function (inputs) {
 
 
 	var options = {
-		path: parse(inputsLogic.url.urlValue, inputsLogic.url.paramsValue),
+		url: config.get("SHAREPOINT_API_BASE_URL") + parse(inputsLogic.url.urlValue, inputsLogic.url.paramsValue),
 		params: inputsLogic.params,
 		headers: inputsLogic.headers,
 		body: inputsLogic.body,
@@ -60,26 +60,24 @@ step.apiCall = function (inputs) {
 
 	switch (inputsLogic.method.toLowerCase()) {
 		case 'get':
-			return httpService.get(options);
+			return httpService.get(Sharepoint(options));
 		case 'post':
-			return httpService.post(options);
+			return httpService.post(Sharepoint(options));
 		case 'delete':
-			return httpService.delete(options);
+			return httpService.delete(Sharepoint(options));
 		case 'put':
-			return httpService.put(options);
+			return httpService.put(Sharepoint(options));
 		case 'connect':
-			return httpService.connect(options);
+			return httpService.connect(Sharepoint(options));
 		case 'head':
-			return httpService.head(options);
+			return httpService.head(Sharepoint(options));
 		case 'options':
-			return httpService.options(options);
+			return httpService.options(Sharepoint(options));
 		case 'patch':
-			return httpService.patch(options);
+			return httpService.patch(Sharepoint(options));
 		case 'trace':
-			return httpService.trace(options);
+			return httpService.trace(Sharepoint(options));
 	}
-
-	//REPLACE THIS WITH YOUR OWN CODE
 
 	return null;
 };
@@ -121,3 +119,57 @@ var stringToObject = function (obj) {
 	}
 	return null;
 };
+
+/****************************************************
+ Configurator
+ ****************************************************/
+
+var Sharepoint = function (options) {
+	options = options || {};
+	options = setApiUri(options);
+	options = setRequestHeaders(options);
+	options = setAuthorization(options);
+	return options;
+}
+
+/****************************************************
+ Private API
+ ****************************************************/
+
+function setApiUri(options) {
+	var url = options.path || "";
+	options.url = config.get("SHAREPOINT_API_BASE_URL") + url;
+	sys.logs.debug('[sharepoint] Set url: ' + options.path + "->" + options.url);
+	delete options.path;
+	return options;
+}
+
+function setRequestHeaders(options) {
+	var headers = options.headers || {};
+	headers = mergeJSON(headers, {"Content-Type": "application/json"});
+	options.headers = headers;
+	return options;
+}
+
+function setAuthorization(options) {
+	var authorization = options.authorization || {};
+	authorization = mergeJSON(authorization, {
+		type: "oauth2",
+		accessToken: sys.storage.get(config.get("oauth").id + ' - access_token'),
+		headerPrefix: "Bearer"
+	});
+	options.authorization = authorization;
+	return options;
+}
+
+function mergeJSON(json1, json2) {
+	const result = {};
+	var key;
+	for (key in json1) {
+		if (json1.hasOwnProperty(key)) result[key] = json1[key];
+	}
+	for (key in json2) {
+		if (json2.hasOwnProperty(key)) result[key] = json2[key];
+	}
+	return result;
+}
