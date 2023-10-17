@@ -11,7 +11,7 @@
         {
             "type": "package",
             "name": "oauth",
-            "version": "v1.0.18"
+            "version": "~v1.0.19"
         }
     ],
     "configurationBuilder": "/configurationBuilder.js",
@@ -88,17 +88,15 @@
     "metadata": [
         {
             "type": "script",
-            "namespace": "api",
+            "namespace": "functions",
             "path": "/scripts/functions.js"
         },
         {
             "type": "listener",
-            "namespace": "webhook",
             "path": "/listeners/listeners.js"
         },
         {
             "type": "flowStep",
-            "namespace": "steps",
             "path": "/flowSteps/apiCallSharepoint"
         }
     ]
